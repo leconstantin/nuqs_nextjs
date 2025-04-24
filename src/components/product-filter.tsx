@@ -9,26 +9,40 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { parseAsInteger, useQueryState } from "nuqs";
-
-export default function ProductFilter() {
+interface ProductFilterProps {
+  refetchProducts: () => Promise<void>;
+}
+export default function ProductFilter({ refetchProducts }: ProductFilterProps) {
   const [search, setSearch] = useQueryState("search", { defaultValue: "" });
   const [perPage, setperPage] = useQueryState(
     "perPage",
     parseAsInteger.withDefault(10)
   );
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    setTimeout(() => {
+      refetchProducts();
+    }, 300);
+  };
+  const handlePerPage = (value: string) => {
+    setperPage(Number(value));
+    setTimeout(() => {
+      refetchProducts();
+    }, 300);
+  };
   return (
     <div className="flex justify-between">
       <div>
         <Input
           placeholder="Search here..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
       <div>
         <Select
           value={perPage.toString()}
-          onValueChange={(value) => setperPage(Number(value))}
+          onValueChange={(value) => handlePerPage(value)}
         >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Per Page" />
